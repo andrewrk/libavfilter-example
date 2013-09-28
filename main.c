@@ -144,7 +144,10 @@ static int audio_decode_frame(AVFormatContext *ic, AVStream *audio_st,
                 av_log(NULL, AV_LOG_ERROR, "error reading buffer from buffersink\n");
                 return -1;
             }
-            ao_play(device, (void*)oframe->data[0], oframe->linesize[0]);
+            int nb_channels = av_get_channel_layout_nb_channels(oframe->channel_layout);
+            int bytes_per_sample = av_get_bytes_per_sample(oframe->format);
+            int data_size = oframe->nb_samples * nb_channels * bytes_per_sample;
+            ao_play(device, (void*)oframe->data[0], data_size);
         }
         return 0;
     }
